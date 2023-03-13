@@ -4,9 +4,10 @@ namespace AddressBookWebAPI.Model
 {
     public class RetrieveAddress
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
         
+        public string Name { get; set; }
+        [Required]
+        [RegularExpression(@"^[0-9a-z.\s+_]+@[0-9a-z-.+]+\.[a-z]{2,4}$")]
         public string email { get; set; }
 
         public long phone { get; set; }

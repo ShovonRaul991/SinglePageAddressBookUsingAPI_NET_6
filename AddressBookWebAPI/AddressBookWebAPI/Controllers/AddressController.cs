@@ -1,104 +1,70 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using AddressBookWebAPI.Data;
 using AddressBookWebAPI.Model;
-using AutoMapper;
+using System.Data.SqlClient;
+using Dapper;
 
 namespace AddressBookWebAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class AddressController : Controller
     {
-        private readonly AddressBookAPIDbContext _context;
-        private readonly IMapper _mapper;
-
-        public AddressController(AddressBookAPIDbContext db, IMapper mapper)
+        private readonly IConfiguration _configuration;
+        public AddressController(IConfiguration configuration)
         {
-            _context= db;
-            _mapper=mapper;
+            _configuration=configuration;
         }
 
         [HttpGet]
-        [Route("GetAllAddress")]
-        public IActionResult Index()
+        [Route("get")]
+        public async Task<IActionResult> Index()
         {
-            var totalData = _mapper.Map<IEnumerable<RetrieveAddress>>(_context.Addresses.ToList());
+            var getAllData = @"Select * from Addresses";
+            using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            var totalData = await connection.QueryAsync<Address>(getAllData);
             return Ok(totalData);
 
         }
 
         [HttpGet]
-        [Route("GetAddress/{id}")]
-        public IActionResult GetAddressDetails(int id)
+        [Route("get/{id}")]
+        public async Task<IActionResult> GetAddressDetails(int id)
         {
-            var tempAddress = _context.Addresses.Find(id);
-            if (tempAddress == null)
-            {
-                return NotFound();
-            }
-            return Ok(_mapper.Map<RetrieveAddress>(tempAddress));
+            var getParticularId = @"Select * from Addresses Where Id = @IdNumber";
+            using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            var totalData = await connection.QueryAsync<Address>(getParticularId, new { IdNumber = id});
+            return Ok(totalData);
         }
 
         [HttpPost]
-        [Route("AddAddress")]
-        public IActionResult GetAddress(RetrieveAddress obj)
+        [Route("add")]
+        public async Task<IActionResult> GetAddress(RetrieveAddress obj)
         {
-            /*
-            var tempAddress = new Address()
-            {
-                Name = obj.Name,
-                email = obj.email,
-                phone = obj.phone,
-                landline = obj.landline,
-                website = obj.website,
-                AddressDetails = obj.AddressDetails,
-            };
-            */
-            var tempAddress = _mapper.Map<Address>(obj);
-            _context.Addresses.Add(tempAddress);
-            _context.SaveChanges();
-            return Ok(tempAddress);
+            var insertAddress = @"Insert into Addresses (Name, email, phone,landline,website, AddressDetails) values (@Name, @email, @phone, @landline, @website, @AddressDetails)";
+            using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            var addresult = await connection.QueryAsync<RetrieveAddress>(insertAddress, obj);
+            return Ok(obj);
         }
 
         [HttpPut]
-        [Route("UpdateAddress")]
-        public IActionResult UpdateAddressDetails(RetrieveAddress obj)
+        [Route("update")]
+        public async Task<IActionResult> UpdateAddressDetails(Address obj)
         {
-            /*
-            var tempAddress = _context.Addresses.Find(id);
-            
-            if(tempAddress== null)
-            {
-                return NotFound();
-            }
-            
-            tempAddress.Name = obj.Name;
-            tempAddress.email = obj.email;
-            tempAddress.phone = obj.phone;
-            tempAddress.landline = obj.landline;
-            tempAddress.website = obj.website;
-            tempAddress.AddressDetails = obj.AddressDetails;
-            */
-            
-            var tempAddress = _mapper.Map<Address>(obj);
-            //tempAddress.Id= id;
-            _context.Addresses.Update(tempAddress);
-            _context.SaveChanges();
-            return Ok(tempAddress);
+            var updateAddress = @"Update Addresses set Name = @Name, email = @email, phone = @phone, landline = @landline, website = @website, AddressDetails = @AddressDetails Where Id = @addressId";
+            using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            var updateresult = await connection.QueryAsync<Address>(updateAddress, new { addressId = obj.Id,Name = obj.Name,email = obj.email,phone = obj.phone,landline=obj.landline, website = obj.website, AddressDetails = obj.AddressDetails });
+            return Ok(obj);
         }
 
         [HttpDelete]
-        [Route("DeleteAddress/{id}")]
-        public IActionResult DeleteAddress(int id)
+        [Route("delete/{id}")]
+        public async Task<IActionResult> DeleteAddress(int id)
         {
-            var tempAddress = _context.Addresses.Find(id);
-            if(tempAddress== null)
-            {
-                return BadRequest();
-            }
-            _context.Remove(tempAddress);
-            _context.SaveChanges();
-            return Ok(tempAddress);
+
+            var deleteAddress = @"Delete from Addresses Where Id = @PersonId";
+            using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            var deleteResult = await connection.QueryAsync(deleteAddress, new { PersonId = id });
+            return Ok(deleteResult);
 
         }
     }
