@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import { Person } from './Person.js';
 import { extructData, selectDetail, saveDetail, updateDetail, deleteDetail } from './Services.js';
 var elements;
@@ -21,72 +30,74 @@ let requiredAddress = document.getElementById('RequiredAddress');
 let selectedContact;
 let validName = false, validEmail = false, validMobile = false, validLandline = false, validSite = false, validAddress = false;
 function dataLoad() {
-    extructData().then((objectData) => {
-        let addressData = "";
-        objectData.map((values) => {
-            //console.log(values)
-            addressData += `<div class="contact-list-item" id=${values.id}>
+    return __awaiter(this, void 0, void 0, function* () {
+        yield extructData().then((objectData) => {
+            let addressData = "";
+            objectData.map((values) => {
+                //console.log(values)
+                addressData += `<div class="contact-list-item" id=${values.id}>
             <p class="contact-name">${values.name}</p>
             <p class="contact-email">${values.email}</p>
             <p class="contact-mobile">+91 ${values.phone}</p>
         </div>`;
-        });
-        document.getElementById("ContactListItems").innerHTML = addressData;
-        elements = document.getElementsByClassName("contact-list-item");
-        for (var i = 0; i < elements.length; i++) {
-            elements[i].addEventListener("click", function (event) {
-                // get the ID of the clicked element from the event object
-                var id = event.currentTarget.id;
-                //selection logic
-                selectDetail(id).then((singleObjectData) => {
-                    var _a;
-                    console.log(singleObjectData);
-                    let allAddress = addresslist.children;
-                    for (let i = 0; i < allAddress.length; i++) {
-                        allAddress[i].style.backgroundColor = 'white';
-                        allAddress[i].style.overflowX = 'hidden';
-                    }
-                    document.getElementById(id).style.backgroundColor = "#CEE7F2";
-                    let human = new Person(singleObjectData.name, singleObjectData.email, singleObjectData.phone, singleObjectData.landline, singleObjectData.website, singleObjectData.addressDetails);
-                    showDetails(human);
-                    inputForm.style.display = 'none';
-                    addressDetails.style.display = 'block';
-                    //edit the contact
-                    document.getElementById("IconEdit").addEventListener('click', function () {
-                        addressDetails.style.display = 'none';
-                        inputForm.style.display = 'block';
-                        addButton.style.display = 'none';
-                        saveButton.style.display = 'block';
-                        entryName.value = document.getElementById('PersonName').innerText;
-                        entryEmail.value = singleObjectData.email;
-                        entryMobile.value = singleObjectData.phone;
-                        entryLandline.value = singleObjectData.landline;
-                        entryWebsite.value = singleObjectData.website;
-                        entryAddress.value = singleObjectData.addressDetails;
-                        formValidate();
-                        console.log(document.getElementById('PersonName').innerText);
-                        console.log(entryName);
-                    });
-                    saveButton.addEventListener('click', function () {
-                        let enteredID = selectedContact;
-                        let enteredName = entryName.value;
-                        let enteredEmail = entryEmail.value;
-                        let enterdedMobile = Number(entryMobile.value);
-                        let enteredLandline = Number((entryLandline).value);
-                        let enteredWebsite = entryWebsite.value;
-                        let enteredAddress = entryAddress.value;
-                        updateDetail(enteredID, enteredName, enteredEmail, enterdedMobile, enteredLandline, enteredWebsite, enteredAddress);
-                        addressDetails.style.display = 'none';
-                        location.reload();
-                    });
-                    (_a = document.getElementById("IconDelete")) === null || _a === void 0 ? void 0 : _a.addEventListener('click', function () {
-                        deleteDetail(selectedContact);
-                        location.reload();
-                    });
-                });
-                selectedContact = id;
             });
-        }
+            document.getElementById("ContactListItems").innerHTML = addressData;
+            elements = document.getElementsByClassName("contact-list-item");
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].addEventListener("click", function (event) {
+                    // get the ID of the clicked element from the event object
+                    var id = event.currentTarget.id;
+                    //selection logic
+                    selectDetail(id).then((singleObjectData) => {
+                        var _a;
+                        console.log(singleObjectData);
+                        let allAddress = addresslist.children;
+                        for (let i = 0; i < allAddress.length; i++) {
+                            allAddress[i].style.backgroundColor = 'white';
+                            allAddress[i].style.overflowX = 'hidden';
+                        }
+                        document.getElementById(id).style.backgroundColor = "#CEE7F2";
+                        let human = new Person(singleObjectData.name, singleObjectData.email, singleObjectData.phone, singleObjectData.landline, singleObjectData.website, singleObjectData.addressDetails);
+                        showDetails(human);
+                        inputForm.style.display = 'none';
+                        addressDetails.style.display = 'block';
+                        //edit the contact
+                        document.getElementById("IconEdit").addEventListener('click', function () {
+                            addressDetails.style.display = 'none';
+                            inputForm.style.display = 'block';
+                            addButton.style.display = 'none';
+                            saveButton.style.display = 'block';
+                            entryName.value = document.getElementById('PersonName').innerText;
+                            entryEmail.value = singleObjectData.email;
+                            entryMobile.value = singleObjectData.phone;
+                            entryLandline.value = singleObjectData.landline;
+                            entryWebsite.value = singleObjectData.website;
+                            entryAddress.value = singleObjectData.addressDetails;
+                            formValidate();
+                            console.log(document.getElementById('PersonName').innerText);
+                            console.log(entryName);
+                        });
+                        saveButton.addEventListener('click', function () {
+                            let enteredID = selectedContact;
+                            let enteredName = entryName.value;
+                            let enteredEmail = entryEmail.value;
+                            let enterdedMobile = Number(entryMobile.value);
+                            let enteredLandline = Number((entryLandline).value);
+                            let enteredWebsite = entryWebsite.value;
+                            let enteredAddress = entryAddress.value;
+                            updateDetail(enteredID, enteredName, enteredEmail, enterdedMobile, enteredLandline, enteredWebsite, enteredAddress);
+                            addressDetails.style.display = 'none';
+                            location.reload();
+                        });
+                        (_a = document.getElementById("IconDelete")) === null || _a === void 0 ? void 0 : _a.addEventListener('click', function () {
+                            deleteDetail(selectedContact);
+                            location.reload();
+                        });
+                    });
+                    selectedContact = id;
+                });
+            }
+        });
     });
 }
 document.addEventListener('DOMContentLoaded', () => {
@@ -113,11 +124,7 @@ addButton.addEventListener('click', function () {
         let enteredAddress = entryAddress.value;
         saveDetail(enteredName, enteredEmail, enterdedMobile, enteredLandline, enteredWebsite, enteredAddress);
         inputForm.style.display = 'none';
-        document.addEventListener('DOMContentLoaded', () => {
-            dataLoad();
-            //location.reload()
-        });
-        //location.reload(); 
+        window.location.reload();
     }
     else {
         alert('Please fill the form properly');

@@ -24,8 +24,8 @@ let requiredAddress = (document.getElementById('RequiredAddress') as HTMLDivElem
 let selectedContact:any;
 let validName:boolean=false,validEmail:boolean=false,validMobile:boolean=false,validLandline:boolean=false,validSite:boolean=false,validAddress:boolean=false;
 
-function dataLoad(){
-     extructData().then((objectData)=>{
+async function dataLoad(){
+     await extructData().then((objectData)=>{
         let addressData = "";
         objectData.map((values:any)=>{
             //console.log(values)
@@ -141,12 +141,8 @@ addButton.addEventListener('click',function(){
         let enteredAddress =  entryAddress.value;
         saveDetail(enteredName,enteredEmail,enterdedMobile,enteredLandline,enteredWebsite,enteredAddress);
         inputForm.style.display = 'none';
-        document.addEventListener('DOMContentLoaded', () => {
-            dataLoad()
-            //location.reload()
-        });
-
-        //location.reload(); 
+        window.location.reload()
+        
     }
     else{
         alert('Please fill the form properly');
